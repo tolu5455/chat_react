@@ -1,5 +1,7 @@
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+### NOTE: Do tuần trước em không đọc kỹ đề nên không sử dụng thư viện react-redux-firebase và đã làm bài theo hướng khác. Tuần này em phải tạo lại git mới do khác git cũ hoàn toàn(Link git cũ https://github.com/tolu5455/chatapp_reactjs). Mong thầy thông cảm cho em.
+
 ## Available Scripts
 
 In the project directory, you can run:
