@@ -1,8 +1,7 @@
 import { createStore, compose, applyMiddleware } from 'redux'
-import { reactReduxFirebase, getFirebase } from 'react-redux-firebase'
-import { reduxFirestore } from 'redux-firestore'
-import firebase from 'firebase/app'
+import { reactReduxFirebase } from 'react-redux-firebase'
 import thunk from 'redux-thunk'
+import firebase from 'firebase/app'
 import 'firebase/auth'
 import 'firebase/firestore'
 import firebaseConfig from '../config/base'
@@ -14,7 +13,7 @@ const enhancers = [
     reactReduxFirebase(firebase, {
         userProfile: 'users',
         enableLogging: false,
-    })
+    }), applyMiddleware(thunk)
 ]
 
 const composedEnhancers = compose(
