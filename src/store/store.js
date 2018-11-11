@@ -12,6 +12,15 @@ firebase.initializeApp(firebaseConfig)
 const enhancers = [
     reactReduxFirebase(firebase, {
         userProfile: 'users',
+        fileMetadataFactory: (uploadRes) => {
+            const { metadata: { name, fullPath, downloadURLs } } = uploadRes
+            return {
+              name,
+              fullPath,
+              downloadURL: downloadURLs[0], 
+              
+            }
+          },
         enableLogging: false,
     }), applyMiddleware(thunk)
 ]
@@ -19,7 +28,6 @@ const enhancers = [
 const composedEnhancers = compose(
     ...enhancers
 )
-
 const store = createStore(rootReducer, initialState, composedEnhancers)
 
 export default store
