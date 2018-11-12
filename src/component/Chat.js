@@ -13,10 +13,14 @@ class Chat extends Component{
   constructor(props){
     super(props)
     this.handleSend = this.handleSend.bind(this)
-    this.dropZoneHandle = this.dropZoneHandle.bind(this)
     this.checkImg = this.checkImg.bind(this)
+    this.getImage = this.getImage.bind(this)
+    this.handleDisplay = this.handleDisplay.bind(this)
     this.state = {
-      isImg: false
+      isImg: false,
+      messageIn: '',
+      displayL: '',
+      displayImg: 'none'
     }
   }
 
@@ -28,9 +32,9 @@ class Chat extends Component{
     this.scrollToBottom(false);
   }
 
-  componentDidUpdate(){
-    this.scrollToBottom({block: 'end', behavior: "smooth"});
-  }
+  // componentDidUpdate(){
+  //   this.scrollToBottom({block: 'end', behavior: "smooth"});
+  // }
 
   checkImg = (img) => {
     const current = this
@@ -47,16 +51,21 @@ class Chat extends Component{
   handleSend = (e) => {
     e.preventDefault();
     var user = this.props.uid
-    var messageInput = e.target.message.value;
-    if (messageInput !== '') {
-      var isValid = false;
-      imageExists(messageInput, function (exists) {
+    var isImg = false;
+    if(e.target.file.files.length !== 0){
+      isImg = true;
+    }  else{
+      imageExists(this.state.messageIn, function(exists) {
         if (exists) {
-          isValid = true
-        } else {
-          isValid = false;
+          isImg = true
         }
-      })
+        else {
+          isImg = false
+        }
+      });
+      this.setState({messageIn: e.target.message.value});
+    }
+    if (this.state.messageIn !== '') {
       var estimatedServerTimeMs = 0;
       var offsetRef = firebase.database().ref(".info/serverTimeOffset");
       offsetRef.on("value", function (snap) {
@@ -65,16 +74,17 @@ class Chat extends Component{
       });
 
       if (user && this.props.name !== undefined) {
-
+        
         const uidSender = user.uid
         const uidReceiver = this.props.user
         const displayName2 = this.props.name
         const message2 = {
           uid: uidReceiver,
           displayName2,
-          text: messageInput,
+          text: this.state.messageIn,
+          isImage: isImg,
           createdAt: estimatedServerTimeMs,
-          isImg: isValid
+          
         }
         const message3 = {
           uid: uidSender,
@@ -87,20 +97,27 @@ class Chat extends Component{
     }
   }
 
-  dropZoneHandle(){
-    return <Dropzone></Dropzone>
+  getImage(e){
+    var image = e.target.files;
+    var imgReader = new FileReader()
+    imgReader.readAsDataURL(image[0])
+    imgReader.onload = e =>{
+    this.setState({messageIn: e.target.result})
+    }
+  }
+
+  handleDisplay(){
+    if(this.state.display === ''){
+      this.setState({display: 'none', displayImg: ''})
+    } else {
+      this.setState({display: '', displayImg: 'none'})
+    }
+    
   }
 
     render(){
 
-      // var storageRef = firebase.storage().ref();
-      // var url = storageRef.child('uploadedFiles' + '/04_PN.jpg').getDownloadURL()
-      // console.log(url);
-
-      // imageExists("https://i.ytimg.com/vi/SfLV8hD7zX4/maxresdefault.jpg", function(exists) {
-      // });
-
-      //var isValid = false;
+      var isValid = false;
       var messageSend = [];
       var twoUsers = [];
       Object.keys(this.props.users).map(uid => {
@@ -123,27 +140,27 @@ class Chat extends Component{
     var message = messageSend.sort(function(a, b){return b.createdAt-a.createdAt});
     var result = [];
     Object.keys(message).map(id => {
-      // imageExists(message[id].text, function(exists) {
-      //   if (exists) {
-      //     isValid = true
-      //   }
-      //   else {
-      //     isValid = false;
-      //   }
-      // });
-      if(message[id].uid === this.props.user && message[id].isImg === true){
-        //isValid = false;
+      imageExists(message[id].text, function(exists) {
+        if (exists) {
+          isValid = true
+        }
+        else {
+          isValid = false;
+        }
+      });
+      if(message[id].uid === this.props.user && message[id].isImage === true){
+        isValid = false;
         result.unshift(
           <li className="clearfix" key={id}>
                   <div className="message-data align-right">
                       <span className="message-data-name" >{this.props.uid.displayName}</span> <i className="fa fa-circle me"></i>
                   </div>
                   <div className="message other-message float-right">
-                  <img style={{width: '100px'}} src={message[id].text} alt="img"/>
+                  <img style={{width: '150px'}} src={message[id].text} alt="img"/>
                     </div>
           </li>
         )
-      } else if(message[id].uid === this.props.user && message[id].isImg === false){
+      } else if(message[id].uid === this.props.user && message[id].isImage === false){
         result.unshift(
           <li className="clearfix" key={id}>
                   <div className="message-data align-right">
@@ -155,15 +172,15 @@ class Chat extends Component{
           </li>
         )
       } else 
-      if(message[id].uid !== this.props.user && message[id].isImg === true){
-        //isValid = false;
+      if(message[id].uid !== this.props.user && message[id].isImage === true){
+        isValid = false;
         result.unshift(
           <li key={id}>
                   <div className="message-data">
                     <span className="message-data-name"><i className="fa fa-circle online"></i>{this.props.name}</span>
                   </div>
                   <div className="message my-message">
-                  <img src={message[id].text} alt="img"/>
+                  <img style={{width: '150px'}} src={message[id].text} alt="img"/>
                     </div>
                 </li>
         );       
@@ -184,7 +201,6 @@ class Chat extends Component{
             <div className="chat">
             <div className="chat-header clearfix">
               <img src={this.props.avatar} alt="avatar" style={{width: '40px'}}/>
-              <img src={this.url} />
               <div className="chat-about">
                 <div className="chat-with" style={{fontSize: 'bold'}}>{this.props.name}</div>
               </div>
@@ -197,13 +213,15 @@ class Chat extends Component{
                 <li ref={(el) => {this.messageEnd = el;}}></li>
               </ul>
 
-            </div>            
+            </div>      
+            <button onClick={this.handleDisplay} style={{marginTop: '15px', marginLeft: '15px'}} >Send Image</button>      
             {/* <button disabled={this.props.user !== undefined ? false : true} style={{marginTop: '15px', marginLeft: '15px'}} onClick={this.dropZoneHandle}>Share image</button> */}
-            <form className="chat-message clearfix" onSubmit={this.handleSend}>
-              <textarea name="message" id="message-to-send" autoFocus placeholder="Type your message" rows="3"></textarea>
+            <form className="chat-message clearfix" onSubmit={this.handleSend}>           
+              <textarea name="message" id="message-to-send" autoFocus placeholder="Type your message" rows="3" 
+                  onChange={e => this.setState({messageIn: e.target.value})} style={{display: this.state.display}}></textarea>
               <i className="fa fa-file-o"></i> &nbsp;&nbsp;&nbsp;
               <i className="fa fa-file-image-o"></i>
-              <UploadImage/>                                
+              <input type="file" name="file" onChange={(e) => this.getImage(e)} style={{display: this.state.displayImg}}/>                              
               <button type="submit">Send</button>
             </form>
           </div>

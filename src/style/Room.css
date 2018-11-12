@@ -41,6 +41,7 @@ body {
 }
 .people-list ul li {
   padding-bottom: 20px;
+  list-style:none;
 }
 .people-list ul li:hover{
   cursor: pointer;
