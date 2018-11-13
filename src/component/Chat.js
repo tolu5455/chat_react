@@ -32,9 +32,9 @@ class Chat extends Component{
     this.scrollToBottom(false);
   }
 
-  // componentDidUpdate(){
-  //   this.scrollToBottom({block: 'end', behavior: "smooth"});
-  // }
+  componentDidUpdate(){
+    this.scrollToBottom({block: 'end', behavior: "smooth"});
+  }
 
   checkImg = (img) => {
     const current = this

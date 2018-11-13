@@ -12,15 +12,6 @@ firebase.initializeApp(firebaseConfig)
 const enhancers = [
     reactReduxFirebase(firebase, {
         userProfile: 'users',
-        fileMetadataFactory: (uploadRes) => {
-            const { metadata: { name, fullPath, downloadURLs } } = uploadRes
-            return {
-              name,
-              fullPath,
-              downloadURL: downloadURLs[0], 
-              
-            }
-          },
         enableLogging: false,
     }), applyMiddleware(thunk)
 ]
