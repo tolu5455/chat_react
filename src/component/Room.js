@@ -14,15 +14,9 @@ class Room extends Component {
   constructor(){
     super()
     this.handleChat = this.handleChat.bind(this)
-    this.handleSearch = this.handleSearch.bind(this)
     this.state = {
       search: ''
     }
-  }
-
-  handleSearch(e){
-    console.log(e.target.value);
-    
   }
 
   handleChat(user, userObj){
@@ -67,53 +61,10 @@ class Room extends Component {
         userRef.set("online")
       }
     });
-    // load list users
-    // var list = [];
-    // var lastTimeList = [];
-    // Object.keys(this.props.users).map(uid => {
-    //   if(this.props.uid.uid !== uid){
-    //     lastTimeList.push(this.props.users[uid].lastTime)
-    //     list.push(this.props.users[uid]);
-    //   }
-    // })
-
-    
-    // var lastTimeMap = [];
-    // Object.keys(lastTimeList).map(uid => {
-    //   Object.keys(lastTimeList[uid]).map(uid2 => {
-    //     if(lastTimeList[uid][uid2].uid === this.props.uid.uid){
-    //       lastTimeMap.push(lastTimeList[uid][uid2].lastTime)
-    //     }
-    //   })
-    // })
-    
-    // Object.keys(list).map(user => {
-    //   if(lastTimeMap[user] < lastTimeMap[user + 1]){
-    //     var temp = list[user];
-    //     list[user] = list[user+1];
-    //     list[user+1] = temp;
-    //   }
-    // })
-
-
-    // var sortList = list.sort(function(a, b){
-    //   if(a.lastTime !== undefined && b.lastTime !== undefined )
-    //   return b.lastTime-a.lastTime
-    // });
 
     Object.keys(this.props.users).map(user => {
       if(this.props.uid.uid !== user && this.props.users[user].displayName.toLowerCase().includes(this.state.search)){
-        var temp = this.props.users[user]
-        // var key = "";
-        // Object.keys(this.props.users).map(uid => {
-        //   if(this.props.uid.uid !== uid){
-        //     if(sortList[user].displayName === this.props.users[uid].displayName){
-        //       key = uid;
-        //       return key;
-        //     }
-        //   }
-        // })   
-                
+        var temp = this.props.users[user]              
         userList.push(         
           <li className="clearfix" key={user} onClick={() => this.handleChat(user, temp)}>
             <img src={this.props.users[user].avatarUrl} alt="avatar" style={{ width: "40px" }} />

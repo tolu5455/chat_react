@@ -4,8 +4,6 @@ import {startSendMessage} from '../action/chat'
 import { connect } from 'react-redux'
 import { compose } from 'redux'
 import { firebaseConnect } from 'react-redux-firebase'
-import Dropzone from 'react-dropzone'
-import UploadImage from './UploadImage';
 const firebase = require("firebase")
 const imageExists = require('image-exists');
 
@@ -86,11 +84,6 @@ class Chat extends Component{
           createdAt: estimatedServerTimeMs,
           
         }
-        const message3 = {
-          uid: uidSender,
-          lastTime: estimatedServerTimeMs
-        }
-        //firebase.database().ref(`users/${uidReceiver}/lastTime/`).push(message3)
         firebase.database().ref(`users/${uidSender}/message/`).push(message2);
       }
       e.target.reset();
@@ -215,7 +208,6 @@ class Chat extends Component{
 
             </div>      
             <button onClick={this.handleDisplay} style={{marginTop: '15px', marginLeft: '15px'}} >Send Image</button>      
-            {/* <button disabled={this.props.user !== undefined ? false : true} style={{marginTop: '15px', marginLeft: '15px'}} onClick={this.dropZoneHandle}>Share image</button> */}
             <form className="chat-message clearfix" onSubmit={this.handleSend}>           
               <textarea name="message" id="message-to-send" autoFocus placeholder="Type your message" rows="3" 
                   onChange={e => this.setState({messageIn: e.target.value})} style={{display: this.state.display}}></textarea>
